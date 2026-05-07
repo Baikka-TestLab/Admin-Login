@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal | Secure Login</title>
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- Login Card -->
+        <div id="login-card" class="card">
+            <div class="card-header">
+                <h1>Admin Login</h1>
+                <p>Secure authentication for system administrators</p>
+            </div>
+            <div class="form-body">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="admin@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <button id="login-btn" class="btn-primary">Sign In</button>
+            </div>
+            <div id="status-msg" class="status-msg"></div>
+        </div>
+
+        <!-- Dashboard / Logout Card (Hidden by default) -->
+        <div id="admin-card" class="card hidden">
+            <div class="card-header">
+                <div class="status-badge">System Active</div>
+                <h1>Welcome Back</h1>
+                <p>Logged in as: <span id="user-email-display" class="highlight"></span></p>
+            </div>
+            <div class="form-body">
+                <p class="info-text">Session data is being synchronized with n8n.</p>
+                <button id="logout-btn" class="btn-secondary">Terminate Session</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>
