@@ -4,7 +4,7 @@ const SUPABASE_URL = 'https://nwyysrqhtgxoizqquizb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_PsNO8XElykjZgm1AAnCJ3Q_W2PvUoAt'; // The one starting with sb_publishable
 
 // Replace this with your n8n Production Webhook URL
-const N8N_WEBHOOK_URL = 'https://YOUR_N8N_INSTANCE/webhook/admin-auth';
+const N8N_WEBHOOK_URL = 'https://1524-747.n8nbysnbd.top/webhook/8fbf04cc-af40-4b0e-88d1-f4536d663df8';
 
 // --- INITIALIZATION ---
 // We use 'supabaseClient' to avoid name conflicts with the library itself
