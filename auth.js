@@ -1,7 +1,7 @@
 // --- CONFIGURATION ---
 // Replace these with your actual Supabase credentials
-const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_KEY = 'YOUR_ANON_PUBLIC_KEY';
+const SUPABASE_URL = 'https://nwyysrqhtgxoizqquizb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_PsNO8XElykjZgm1AAnCJ3Q_W2PvUoAt';
 
 // Replace this with your n8n Webhook URL (Production URL recommended)
 const N8N_WEBHOOK_URL = 'https://YOUR_N8N_INSTANCE/webhook/admin-auth-log';
