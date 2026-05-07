@@ -1,15 +1,16 @@
 // --- CONFIGURATION ---
-// Replace these with your actual Supabase credentials
-const SUPABASE_URL = 'https://nwyysrqhtgxoizqquizb.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_PsNO8XElykjZgm1AAnCJ3Q_W2PvUoAt';
+// Replace these with your actual details from the Supabase dashboard
+const SUPABASE_URL = 'https://nwyysrqhtgxoizqquizb.supabase.co'; 
+const SUPABASE_KEY = 'sb_publishable_PsNO8XElykjZgm1AAnCJ3Q_W2PvUoAt'; // The one starting with sb_publishable
 
-// Replace this with your n8n Webhook URL (Production URL recommended)
-const N8N_WEBHOOK_URL = 'https://YOUR_N8N_INSTANCE/webhook/admin-auth-log';
+// Replace this with your n8n Production Webhook URL
+const N8N_WEBHOOK_URL = 'https://YOUR_N8N_INSTANCE/webhook/admin-auth';
 
 // --- INITIALIZATION ---
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// We use 'supabaseClient' to avoid name conflicts with the library itself
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// --- ELEMENTS ---
+// --- DOM ELEMENTS ---
 const loginCard = document.getElementById('login-card');
 const adminCard = document.getElementById('admin-card');
 const statusMsg = document.getElementById('status-msg');
@@ -18,26 +19,26 @@ const loginBtn = document.getElementById('login-btn');
 const logoutBtn = document.getElementById('logout-btn');
 
 // --- EVENT LISTENERS ---
-loginBtn.addEventListener('click', handleLogin);
-logoutBtn.addEventListener('click', handleLogout);
+if (loginBtn) loginBtn.addEventListener('click', handleLogin);
+if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
 
 // --- FUNCTIONS ---
 
 /**
- * Handles the login process using Supabase Auth
+ * Handles the login process
  */
 async function handleLogin() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
     if (!email || !password) {
-        showMessage('Please fill in all fields', 'error');
+        showMessage('Please enter both email and password.', 'error');
         return;
     }
 
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
         email: email,
         password: password,
     });
@@ -46,11 +47,11 @@ async function handleLogin() {
         showMessage(error.message, 'error');
         setLoading(false);
     } else {
-        showMessage('Login successful!', 'success');
+        showMessage('Success! Redirecting...', 'success');
         updateUI(data.user);
         
-        // Trigger n8n Workflow
-        sendToN8N('LOGIN_SUCCESS', data.user.email);
+        // Notify n8n
+        sendToN8N('LOGIN', data.user.email);
     }
 }
 
@@ -60,19 +61,19 @@ async function handleLogin() {
 async function handleLogout() {
     const email = userEmailDisplay.innerText;
     
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
     
     if (error) {
-        showMessage('Logout failed', 'error');
+        showMessage('Logout failed.', 'error');
     } else {
         updateUI(null);
-        // Trigger n8n Workflow
-        sendToN8N('LOGOUT_SUCCESS', email);
+        // Notify n8n
+        sendToN8N('LOGOUT', email);
     }
 }
 
 /**
- * Updates the visibility of the login vs dashboard view
+ * Updates the UI based on auth state
  */
 function updateUI(user) {
     if (user) {
@@ -89,34 +90,32 @@ function updateUI(user) {
 }
 
 /**
- * Sends authentication details to n8n Webhook
+ * Sends data to n8n Webhook
  */
-async function sendToN8N(event, email) {
+async function sendToN8N(action, email) {
     try {
         await fetch(N8N_WEBHOOK_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                event: event,
+                action: action,
                 admin_email: email,
-                timestamp: new Date().toISOString(),
-                user_agent: navigator.userAgent
+                date: new Date().toLocaleString(),
+                platform: navigator.platform
             })
         });
-        console.log(`n8n logged: ${event}`);
+        console.log(`n8n notified of ${action}`);
     } catch (err) {
-        console.error('Failed to notify n8n:', err);
+        console.error('n8n notification failed:', err);
     }
 }
 
 function showMessage(msg, type) {
     statusMsg.innerText = msg;
-    statusMsg.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
+    statusMsg.style.color = type === 'error' ? '#ef4444' : '#22c55e';
 }
 
 function setLoading(isLoading) {
-    loginBtn.innerText = isLoading ? 'Authenticating...' : 'Sign In';
+    loginBtn.innerText = isLoading ? 'Verifying...' : 'Sign In';
     loginBtn.disabled = isLoading;
 }
